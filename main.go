@@ -52,7 +52,7 @@ const (
 	splTransferQuery = `subscription {
 		Solana {
 		  Transfers(
-			where: {Transfer: {Currency: {MintAddress: {is: "3LAjGfLUSEomZdfgsEAN1Chb4ZrtoDLQPkBoWQDq7WkK"}}}}
+			where: {Transfer: {Currency: {MintAddress: {is: "FiBSKnRpjNHChN1BANpr3dsVFQuuHhETMen4xUDgpump"}}}}
 		  ) {
 			Transfer {
 			  Currency {
