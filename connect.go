@@ -54,6 +54,6 @@ func Connect(url string, query string) {
 			}
 			log.Fatal("Failed to read message:", err)
 		}
-		fmt.Printf("Received message: %s\n", message)
+		eventChan <- string(message)
 	}
 }
