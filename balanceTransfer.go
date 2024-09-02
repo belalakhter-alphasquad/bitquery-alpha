@@ -8,12 +8,12 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func Ohlc() {
+func BalanceTransfer(url string, query string) {
 	headers := http.Header{}
 	headers.Set("Sec-WebSocket-Protocol", "graphql-ws")
 	headers.Set("Content-Type", "application/json")
 
-	conn, _, err := websocket.DefaultDialer.Dial(serverURL, headers)
+	conn, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
 		log.Fatal("Failed to connect to WebSocket server:", err)
 	}
@@ -38,7 +38,7 @@ func Ohlc() {
 	subscriptionPayload := map[string]interface{}{
 		"type":    "start",
 		"id":      "1",
-		"payload": map[string]string{"query": ohlcQuery},
+		"payload": map[string]string{"query": query},
 	}
 	err = conn.WriteJSON(subscriptionPayload)
 	if err != nil {
