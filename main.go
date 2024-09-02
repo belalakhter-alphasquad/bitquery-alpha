@@ -1,7 +1,7 @@
 package main
 
 const (
-	serverURL = "wss://streaming.bitquery.io/eap?token=ory_at_aPzjXLYjGhpsW16NmIiBsspdDTo7XxWZ0UdHeuFTeCE.aN7TkdMNL87ZzqG0YG6CsBFvJXyZJlWb8Qm_mBWxtUQ"
+	serverURL = "wss://streaming.bitquery.io/eap?token=ory_at_t9d0ZJVrgBD0TYAr91Meb8kfiAnPpAHX87iE4YWXw6I.ayTNpiPmRIvGX6G0Pfsu_XT3jX2F4GYlAOhfNh1Q_F4"
 	ohlcQuery = `subscription {
 		Solana {
 		  DEXTradeByTokens(
@@ -82,6 +82,6 @@ const (
 
 func main() {
 
-	Connect(serverURL, splTransferQuery)
+	Connect(serverURL, balanceTransferQuery)
 
 }
