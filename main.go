@@ -49,10 +49,39 @@ const (
 		}
 	  }
 	  `
+	splTransferQuery = `subscription {
+		Solana {
+		  Transfers(
+			where: {Transfer: {Currency: {MintAddress: {is: "3LAjGfLUSEomZdfgsEAN1Chb4ZrtoDLQPkBoWQDq7WkK"}}}}
+		  ) {
+			Transfer {
+			  Currency {
+				MintAddress
+				Symbol
+				Name
+				Fungible
+				Native
+			  }
+			  Receiver {
+				Address
+			  }
+			  Sender {
+				Address
+			  }
+			  Amount
+			  AmountInUSD
+			}
+			Transaction{
+			  Signature
+			}
+		  }
+		}
+	  }
+	  `
 )
 
 func main() {
 
-	BalanceTransfer(serverURL, balanceTransferQuery)
+	Connect(serverURL, splTransferQuery)
 
 }

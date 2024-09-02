@@ -8,7 +8,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-func BalanceTransfer(url string, query string) {
+func Connect(url string, query string) {
 	headers := http.Header{}
 	headers.Set("Sec-WebSocket-Protocol", "graphql-ws")
 	headers.Set("Content-Type", "application/json")
