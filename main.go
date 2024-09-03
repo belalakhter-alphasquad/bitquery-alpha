@@ -277,7 +277,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 			}
 			if eventMsg.Type == "data" {
 				for _, tradeData := range eventMsg.Payload.Data.Solana.DEXTradeByTokens {
-					if tradeData.Trade.Currency.Symbol == "TrumpOnX" {
+					if tradeData.Trade.Currency.Symbol == "TrumpOnX" || tradeData.Trade.Currency.Name == "TrumpOnX" {
 						err := conn.WriteJSON(eventMsg)
 						if err != nil {
 							log.Printf("Error sending event message: %v", err)
