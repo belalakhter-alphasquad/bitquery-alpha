@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -55,6 +56,11 @@ func Connect(url string, query string) {
 			log.Fatal("Failed to read message:", err)
 		}
 
-		eventChan <- string(message)
+		var subData SubscriptionData
+		if err := json.Unmarshal(message, &subData); err != nil {
+			log.Fatal("Failed to unmarshal message:", err)
+		}
+		eventChan <- subData
+
 	}
 }
