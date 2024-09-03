@@ -72,7 +72,7 @@ const (
 			orderBy: { descendingByField: "Block_Timefield" }
 			where: {
 			  Trade: {
-				Currency: {MintAddress: {is: "EsY9oWzqj94ZiqEEWfwNzVVixKis4zZHfKddQrub1YpT}} 
+				Currency: {MintAddress: {in: $Addresses}} 
 				Dex: {
 				  ProgramAddress: {
 					is: "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
@@ -160,9 +160,7 @@ const (
 
 func substituteAddress(query string, address string) string {
 
-	var addresses = []string{
-		"7hfftzJ5QVUwsZxhUHyi8SfPUrXDinGkU7wujqN6pump",
-	}
+	var addresses = []string{}
 
 	addresses = append(addresses, address)
 
@@ -193,7 +191,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if Address != "" {
-		// query = substituteAddress(query, Address)
+		query = substituteAddress(query, Address)
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
