@@ -32,7 +32,7 @@ const (
 			orderBy: { descendingByField: "Block_Timefield" }
 			where: {
 			  Trade: {
-				Currency: { mintAddress: { is: "EsY9oWzqj94ZiqEEWfwNzVVixKis4zZHfKddQrub1YpT" } }
+				Currency: {MintAddress: {in: $Addresses}} 
 				Dex: {
 				  ProgramAddress: {
 					is: "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
@@ -44,6 +44,9 @@ const (
 			Block {
 			  Timefield: Time(interval: { in: minutes, count: 1 })
 			}
+			baseCurrency {
+				mintAddress
+			  }
 			volume: sum(of: Trade_Amount)
 			Trade {
 			  high: PriceInUSD(maximum: Trade_Price)
