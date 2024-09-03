@@ -126,7 +126,7 @@ const (
 	priceQuery = `subscription {
 		Solana {
 		  DEXTradeByTokens(
-			limit: {count: 1}
+			limit: {count: 10}
 			orderBy: {descending: Block_Height}
 			where: {Trade: {Side: {Currency: {MintAddress: {is: "So11111111111111111111111111111111111111112"}}}, Currency: {MintAddress: {in: ["EsY9oWzqj94ZiqEEWfwNzVVixKis4zZHfKddQrub1YpT","7hfftzJ5QVUwsZxhUHyi8SfPUrXDinGkU7wujqN6pump", "BhHDowogMZ5YvGVvnkBYJVmwdnHtMjUMBAgaxk8fpump", "AEBnyoEZQRaat6RR3N2LVwdFqN9zWtgeSkMevgUfpump", "AakLXoLVQNCTKAWyczcxYDkHozpvhvNEmHsQLKFzpump", "DWx8pAjXt4T9LAJCJyPY1dRnPe7hSpGi8Qsg2Pfkpump",
 			"993CrgJj5iV2vnE14B5qKzsKfCDpwXLdcNjpBafVpump", "EXCKNw3tUWpQ3Df8wN86CU3K4EeKh9WZgE1xBodApump", "7pYDzBtv7xr3QiF4cXEuF6any5dxzB5opMKBMiEgpump", "3giJ6SEP22ocpNxUt58Ry3cUb5MKUhntg6mtCULfpump", "7pYDzBtv7xr3QiF4cXEuF6any5dxzB5opMKBMiEgpump",
