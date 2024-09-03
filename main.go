@@ -19,20 +19,60 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-var (
-	eventChan = make(chan interface{}, 100)
-)
+type Currency struct {
+	MintAddress string `json:"MintAddress"`
+}
+
+type Trade struct {
+	Currency Currency `json:"Currency"`
+	Close    float64  `json:"close"`
+	High     float64  `json:"high"`
+	Low      float64  `json:"low"`
+	Open     float64  `json:"open"`
+}
+
+type Block struct {
+	Timefield string `json:"Timefield"`
+}
+
+type Event struct {
+	Block  Block  `json:"Block"`
+	Trade  Trade  `json:"Trade"`
+	Count  string `json:"count"`
+	Volume string `json:"volume"`
+}
+
+type DEXTradeByTokens struct {
+	Block  Block  `json:"Block"`
+	Trade  Trade  `json:"Trade"`
+	Count  string `json:"count"`
+	Volume string `json:"volume"`
+}
+
+type Data struct {
+	Payload struct {
+		Data struct {
+			Solana struct {
+				DEXTradeByTokens []DEXTradeByTokens `json:"DEXTradeByTokens"`
+			} `json:"Solana"`
+		} `json:"data"`
+	} `json:"payload"`
+	ID   string `json:"id"`
+	Type string `json:"type"`
+}
+
+var eventChan = make(chan string)
 
 const (
 	serverURL = "wss://streaming.bitquery.io/eap?token=ory_at_e_wAazl2aa4UXhgSxe_1Nsk1-nAB2HUnQMDBT43n4RI.LvBbAqVy4_vWSxf6OGQrXqe4PeHcGjx32l37k7JqX3I"
 	ohlcQuery = `query {
 		Solana {
 		  DEXTradeByTokens(
-			limit: {count:1000}
+			limit: {count:1}
 			orderBy: { descendingByField: "Block_Timefield" }
 			where: {
 			  Trade: {
-				Currency: {MintAddress: {in: $Addresses}} 
+				Currency: {MintAddress: {is: "EsY9oWzqj94ZiqEEWfwNzVVixKis4zZHfKddQrub1YpT}} 
 				Dex: {
 				  ProgramAddress: {
 					is: "6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P"
@@ -44,15 +84,16 @@ const (
 			Block {
 			  Timefield: Time(interval: { in: minutes, count: 1 })
 			}
-			baseCurrency {
-				mintAddress
-			  }
 			volume: sum(of: Trade_Amount)
 			Trade {
 			  high: PriceInUSD(maximum: Trade_Price)
 			  low: PriceInUSD(minimum: Trade_Price)
 			  open: PriceInUSD(minimum: Block_Slot)
 			  close: PriceInUSD(maximum: Block_Slot)
+			  Currency {
+				MintAddress
+			  }
+		
 			}
 			count
 		  }
@@ -120,16 +161,7 @@ const (
 func substituteAddress(query string, address string) string {
 
 	var addresses = []string{
-		"7hfftzJ5QVUwsZxhUHyi8SfPUrXDinGkU7wujqN6pump", "BhHDowogMZ5YvGVvnkBYJVmwdnHtMjUMBAgaxk8fpump", "AEBnyoEZQRaat6RR3N2LVwdFqN9zWtgeSkMevgUfpump", "AakLXoLVQNCTKAWyczcxYDkHozpvhvNEmHsQLKFzpump", "DWx8pAjXt4T9LAJCJyPY1dRnPe7hSpGi8Qsg2Pfkpump",
-		"993CrgJj5iV2vnE14B5qKzsKfCDpwXLdcNjpBafVpump", "EXCKNw3tUWpQ3Df8wN86CU3K4EeKh9WZgE1xBodApump", "7pYDzBtv7xr3QiF4cXEuF6any5dxzB5opMKBMiEgpump", "3giJ6SEP22ocpNxUt58Ry3cUb5MKUhntg6mtCULfpump", "7pYDzBtv7xr3QiF4cXEuF6any5dxzB5opMKBMiEgpump",
-		"HzhGr945HZhyvcYCmzXFYHd8S5s4tJgv1Ask2su4pump", "BC76VfY4hNiNZiCYaPdoC9iRqfYCCZPqfTAEJHWLpump", "3H8ekRwUpgTijjNDU77qxtCrgSt24d1s1pByNYo2pump", "D8JgEYSNA8593S5zKdxky64HaUdj2rVyCaPsR1akpump", "4hbpRHxo4WoxxoVjayC71i7LjuLMmb9v3ckuFMDMpump",
-		"4LQyfbSoawZLemacQNDktMpCaSY8i5oxLXKhvKvNpump", "97NRmqq1iLLnr3gKbu5p1qYdEygapPhhQG1PRJ4Tpump", "34injJbUYZthAnfeJ36KQokJgD6riCEPTQbNxKHNpump", "8bSTr3Rn185gUNxMbeEzyoccQQvpZqXFgVPQRuCFpump", "bjpCbRDQvPjTK8oukaGXBWTWNfYvYy9z5p1GzFapump",
-		"AHEfpyu51jkt37LL1nb4Yiva9sgAqK4JA7veKcBGpump", "ERMagsFMBiB7XYJ2qY74kepSfpTd8vdiKrHQsGPgpump", "AHEfpyu51jkt37LL1nb4Yiva9sgAqK4JA7veKcBGpump", "H2Nj8ijdaRVjgkZQCj6XRofxsoCivXNK7e8jHR9ypump", "34kvJZAvad3b9VD6YCSxDetPnq6RbtLGkt48L8S4pump",
-		"HDJRGG2Y8fzQHdaS71QhzeKD5UqZ8CCbTX7PYo9ppump", "DnmQRUBBg89z3QqGJqGi7J4jpb9n1nEDb6mZGJ8Gpump", "42zd8aPC79dFxSNkRDLoaXnKV68xdxxeokoCyVF9pump", "6bDYTWZbxCHZgRLyEELphJv55tHJXRHmyHUEbpXXpump", "FibAyTch6pqDUk5LQmW3PUvExqGHzLQBrRSb8rHdpump",
-		"8HWFVn4DnqdZ14AG4AsDLwUwSPbbUCy9sqokSXmapump", "2bg7i2nueRUJ1KLSiFa2ewJ5By1Q39MH9vfn1Tvtpump", "EXLAATFGbUBPkAVPnLcF64vJhZc5ikkbKCRGXuVvpump", "ECs4ZLGaRte5iPfkaYznBEUviMC539aXzcF4SUmdpump", "sQB8ng2BgciryiHNvwUyFZVgLYdYM1XnQsnKg96pump",
-		"51dM85YyP6LNo1cei7deBJY4uTq2h3gS2esz3woZpump", "X1CCaXbhNwb53qoShVoSoWxCJQWR3fxon96K2Rrpump", "CX3EZnnVnw7PE7mCyuVP5YaCLsgLFskw8PYyWfFzpump", "7ChcuVcY1yUkHqXNnj6vwYhKXFEmTK97vpyquS6Zpump", "9xEBdrwkYJhJfsRZH8yiTszWAk3Y3Jc3shbFoy1zpump",
-		"8PN525m8UDdmYpVhh3D1A92VGCkx2xCM6VyFPK5npump", "F5K2P31i8ta3dJSvJe4wZF5tbdvYNTtp7ZENWTk2pump", "Desz5fga9AbBCs8weD2pdSFXiAgdCFNsuMoqrj8dpump", "B61w7iLAnatA5rZkK18niohTwTda3bhzY51wF5zkpump", "HP2kVY9Fz4zR41sHQT4XZ4udpWXLCQNbSnouAZiMvq5y",
-		"sQB8ng2BgciryiHNvwUyFZVgLYdYM1XnQsnKg96pump", "DPxY4KD723wsLwsiAGgjznXCMxDfUbjruxXeFLsspump", "CDCAVw72kXzW9X57sn9Knmh1ttX7uZPahrdhSePqpump", "Gr4t1Aw1qUFrWLj2wgKrYvQ66dT7m2iZ6EWnTi4pump",
+		"7hfftzJ5QVUwsZxhUHyi8SfPUrXDinGkU7wujqN6pump",
 	}
 
 	addresses = append(addresses, address)
@@ -161,7 +193,7 @@ func handleRequest(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if Address != "" {
-		query = substituteAddress(query, Address)
+		// query = substituteAddress(query, Address)
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)
